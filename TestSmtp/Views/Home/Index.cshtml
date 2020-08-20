@@ -1,0 +1,120 @@
+﻿@model SmtpMessageViewModel
+@{
+    ViewBag.Title = "Smtp Client";
+}
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    @using (Ajax.BeginForm("SendEmail", "Home", new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAjaxRequestSuccess", UpdateTargetId = "divEmp" }, new { @id = "formSmtp", @class = "" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group col-lg-8">
+            <label for="SmtpServer">SMTP address</label>
+            @Html.EditorFor(model => model.SmtpServer, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="exampleInputEmail1">Port</label>
+            @Html.EditorFor(model => model.SmtpPort, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+
+        <div class="form-check col-md-4">
+            @Html.CheckBoxFor(m => m.IsUseCredentials, new { @class = "form-check-input" })
+            <label for="exampleInputEmail1">Use Credentials</label>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="exampleInputEmail1">SMTP User</label>
+            @Html.EditorFor(model => model.SmtpUserName, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+        <div class="form-group col-md-4">
+            <label for="exampleInputEmail1">Password</label>
+            @Html.PasswordFor(model => model.SmtpPassword, new { @class = "form-control" })
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group col-md-12">
+            @Html.CheckBoxFor(m => m.EnableSsl)
+            <label for="exampleInputEmail1">Use SSL</label>
+        </div>
+
+        <div class="border border-dark">
+            <div class="form-group col-md-12">
+                <label for="exampleInputEmail1">From</label>
+                @Html.EditorFor(model => model.EmailFrom, new { htmlAttributes = new { @class = "form-control" } })
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group col-md-12">
+                <label for="exampleInputEmail1">To</label>
+                @Html.EditorFor(model => model.EmailTo, new { htmlAttributes = new { @class = "form-control" } })
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group col-md-12">
+                <label for="exampleInputEmail1">Subject</label>
+                @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "form-control" } })
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group col-md-12">
+                <label for="exampleFormControlTextarea1">Body</label>
+                @Html.TextAreaFor(m => m.Body, new { @class = "form-control", @rows = "3" })
+            </div>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    }
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            init();
+            function init() {
+                eventHandler();
+            }
+
+            function eventHandler() {
+                $("#formSmtp").submit(function (event) {
+                    debugger
+                    Submit(event);
+                    return false;
+                });
+
+            }
+            function Submit(event) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                let action = $("#formSmtp").attr("action");
+                let dataString = new FormData($("#formSmtp").get(0));
+                let contentType = false;
+                let processData = false;
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    data: dataString,
+                    dataType: "json",
+                    contentType: contentType,
+                    processData: processData,
+                    success: function (result) {
+                        // Result.
+                        onAjaxRequestSuccess(result);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //do your own thing
+                        alert("fail");
+                    }
+                });
+            }
+            var onAjaxRequestSuccess = function (result) {
+                if (result.EnableError) {
+                    // Setting.
+                    alert(result.ErrorMsg);
+                } else if (result.EnableSuccess) {
+                    // Setting.
+                    alert(result.SuccessMsg);
+                    // Resetting form.
+                    $('#AjaxformId').get(0).reset();
+                }
+            }
+
+        });
+    </script>
+}
