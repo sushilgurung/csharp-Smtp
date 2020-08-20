@@ -60,6 +60,12 @@ namespace TestSmtp.Controllers
             {
                 // Info  
                 Console.Write(ex);
+                return this.Json(new
+                {
+                    EnableError = true,
+                    ErrorTitle = "Error",
+                    ErrorMsg = ex.Message
+                });
             }
             // Info  
             return this.Json(new
